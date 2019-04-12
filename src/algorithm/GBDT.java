@@ -14,8 +14,18 @@ import java.util.Map;
 
 public class GBDT {
 	//right now only support discrete features.
-	public double evaluate(Map<String, String> data) {
-		return 0.0;
+	public double evaluate(InputData data,GBDTModel model) {
+		List<RegressionTreeModel> treeModels = model.getTreeModels();
+		List<Map<String, Double>> lambdaList = model.getLambdas();
+		double lastRoundResult = model.getInitialGuess();
+		for (RegressionTreeModel treeModel:treeModels) {
+			int index= treeModels.indexOf(treeModel);
+			Map<String, Double> ruleLambda = lambdaList.get(index);
+			String rule = treeModel.getRule(data);
+			double lambda = ruleLambda.get(rule);
+			lastRoundResult += lambda;
+		}
+		return lastRoundResult;
 	}
 
 	public GBDTModel trainModel(List<InputData> data, int numberOfTrees, String lossFunction) {
