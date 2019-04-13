@@ -72,9 +72,23 @@ public class Helper {
 		Collections.sort(tempList);
 		int length = tempList.size();
 		if (length % 2 == 0) {
-			return (list.get(length / 2 - 1) + list.get(length / 2)) / 2;
+			return (tempList.get(length / 2 - 1) + tempList.get(length / 2)) / 2;
 		} else {
-			return list.get((length - 1) / 2);
+			return tempList.get((length - 1) / 2);
 		}
+	}
+
+	public static List<InputData> copyData(List<InputData> data) {
+		List<InputData> operatableData = new LinkedList<>();
+		for (InputData dataItem : data) {
+			Map<String, String> originalData = dataItem.getData();
+			Map<String, String> dataCloned = new HashMap<>();
+			for (String key : originalData.keySet()) {
+				dataCloned.put(new String(key), new String(originalData.get(key)));
+			}
+			InputData clone = new DiscreteFeatureData(dataCloned, new String(dataItem.getTargetColumnName()));
+			operatableData.add(clone);
+		}
+		return operatableData;
 	}
 }

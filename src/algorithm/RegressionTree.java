@@ -41,7 +41,7 @@ public class RegressionTree {
 			for (double value : values) {
 				error += Math.pow(value - mean, 2);
 			}
-			loss += (splittedData.size() / data.size() * (error / splittedData.size()));
+			loss += (splittedData.size() * 1.0 / data.size() * (error / splittedData.size()));
 
 		}
 		return loss;
@@ -84,18 +84,18 @@ public class RegressionTree {
 			List<String> features = data.get(0).getFeatureKeys();
 			boolean allSame = allTheSameInTarget(targetValues);
 			if (allSame) {
-				return new TreeNode(features.get(0), targetValues.get(0), true, null);
+				return new TreeNode("", targetValues.get(0), true, null);
 			} else {
 				if (data.size() < minimumElements) {
-					return new TreeNode(features.get(0), Helper.computeMean(targetValues), true, null);
-				} else if (features.size() == 1) {
-					return new TreeNode(features.get(0), Helper.computeMean(targetValues), true, null);
+					return new TreeNode("", Helper.computeMean(targetValues), true, null);
+				} else if (features.size() == 0) {
+					return new TreeNode("", Helper.computeMean(targetValues), true, null);
 				} else {
 					String bestSplitFeature = getBestSplit(features, data, lossFunction);
 					Map<String, List<InputData>> splittedData = splitDataByFeature(bestSplitFeature, data, true);
 					Map<String, TreeNode> children = new HashMap<>();
 					for (String key : splittedData.keySet()) {
-						List<InputData> dataList = splittedData.get(key);
+						List<InputData> dataList = Helper.copyData(splittedData.get(key));
 						children.put(key, train(dataList, minimumElements, lossFunction));
 					}
 					return new TreeNode(bestSplitFeature, null, false, children);
@@ -106,16 +106,16 @@ public class RegressionTree {
 	}
 
 	public RegressionTreeModel trainModel(List<InputData> data, int minimumElements, String lossFunction) {
-		TreeNode root = train(data, minimumElements, lossFunction);
+		TreeNode root = train(Helper.copyData(data), minimumElements, lossFunction);
 		RegressionTreeModel regressionTreeModel = new RegressionTreeModel(root);
 		Map<String, List<Double>> rules = new HashMap<>();
 		for (InputData dataItem : data) {
 			String rule = regressionTreeModel.getRule(dataItem);
 			double targetValue = Double.parseDouble(dataItem.getData().get(dataItem.getTargetColumnName()));
-			if(rules.containsKey(rule)){
+			if (rules.containsKey(rule)) {
 				rules.get(rule).add(targetValue);
-			}else{
-				rules.put(rule,new LinkedList<>(){{
+			} else {
+				rules.put(rule, new LinkedList<>() {{
 					add(targetValue);
 				}});
 			}
