@@ -28,7 +28,7 @@ public class GBDT {
 		return lastRoundResult;
 	}
 
-	public GBDTModel trainModel(List<InputData> data, int numberOfTrees, String lossFunction) {
+	public GBDTModel trainModel(List<InputData> data, int numberOfTrees, String lossFunction,int minElement) {
 		List<Double> targetValues = Helper.getContinuousTargetValues(data);
 		GBDTModel model = new GBDTModel();
 		RegressionTree regressionTree = new RegressionTree();
@@ -54,7 +54,7 @@ public class GBDT {
 					String targetName = dataItem.getTargetColumnName();
 					dataItem.getData().put(targetName, yTilde.get(index).toString());
 				}
-				RegressionTreeModel regressionTreeModel = regressionTree.trainModel(data, Helper.MIN_ELEMENT_IN_LEAF, Helper.MSE);
+				RegressionTreeModel regressionTreeModel = regressionTree.trainModel(data, minElement, Helper.MSE);
 				Map<String, List<Double>> residualsInLeaf = new HashMap<>();
 				for (InputData dataItem : data) {
 					String rule = regressionTreeModel.getRule(dataItem);
